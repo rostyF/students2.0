@@ -1,17 +1,18 @@
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class GroupFileStorage {
 
     public void saveGroupToCSV(Group gr) {
-        Student[] students = gr.getStudents();
+        List<Student> students = gr.getStudents();
         CSVStringConverter cnvrt = new CSVStringConverter();
         String fileName = gr.getGroupName() + ".csv";
         File fileOut = new File(fileName);
 
 
-        for (int i = 0; i < students.length; i++) {
-            String csv = cnvrt.toStringRepresentation(students[i]) + "\n";
+        for (int i = 0; i < students.size(); i++) {
+            String csv = cnvrt.toStringRepresentation(students.get(i)) + "\n";
 
             try {
                 saveStringToFile(csv, fileOut);
@@ -40,7 +41,7 @@ public class GroupFileStorage {
                 if (temp == null) {
                     break;
                 }
-                if(result.getStudents()[9] != null){
+                if(result.getStudents().size() == 10){
                     System.out.println("Група переповнена");
                     break;
                 }
