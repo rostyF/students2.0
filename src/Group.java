@@ -1,9 +1,13 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 public class Group {
     private String groupName;
 
-    private Student [] students = new Student[10];
+    //private Student [] students = new Student[10];
+    private List<Student> students = new ArrayList<>();
 
     public Group() {
         super();
@@ -21,11 +25,11 @@ public class Group {
         this.groupName = groupName;
     }
 
-    public Student[] getStudents() {
+    public List<Student> getStudents() {
         return students;
     }
 
-    public void setStudents(Student[] students) {
+    public void setStudents(List<Student> students) {
         this.students = students;
     }
 
@@ -38,45 +42,38 @@ public class Group {
     }
 
     public void addStudent(Student student) throws GroupOverflowException{
-        Integer index = getArrayIndex();
-        if(index == null) throw new GroupOverflowException("Група переповнена");
-        students[index] = student;
+        if(students.size() == 10) throw new GroupOverflowException("Група переповнена");
+        else students.add(student);
     }
 
     public Student searchStudentByLastName(String lastName) throws StudentNotFoundException {
-        Integer index = getStudentIndex(lastName);
-        if (index == null) throw new StudentNotFoundException("Такого студента в групі немає");
-        return students[index];
+        for (Student student: students) {
+            if(student.getLastName().equals(lastName))
+                return student;
+        }
+        throw new StudentNotFoundException("Студента не знайдено в групі");
     }
 
-    private Integer getStudentIndex(String lastName) {
-        for (int i = 0; i < students.length; i++) {
-            if (students[i] != null && students[i].getLastName() != null && students[i].getLastName().equals(lastName)) return i;
-        }
-        return null;
-    }
 
     public boolean removeStudentByID(int id){
-        for(int i=0; i< students.length; i++){
-            if(students[i] == null) i++;
-            else if(students[i].getId() == id){
-                students[i] = null;
-                return true;
+        for(Student student: students){
+            if(student.getId() == id) {
+                students.remove(student);
+                System.out.println("Студента було видалено");
             }
         }
         return false;
     }
 
-    private Integer getArrayIndex(){
-        for(int i=0; i< students.length; i++){
-            if (students[i] == null) return i;
-        }
-        return null;
-    }
 
     public String sortByLastName(){
-        Student[] resultArray;
-        resultArray = students;
+        Student[] resultArray = new Student[students.size()];
+        int i=0;
+        for(Student student: students){
+            resultArray[i] = student;
+            i++;
+        }
+
         Arrays.sort(resultArray, new StudentLastNameComparator());
         String result = "";
         for(Student student : resultArray){
@@ -85,5 +82,42 @@ public class Group {
         return result;
     }
 
+    public void checkStudentsForUnique(){
+        List<Student> array = this.getStudents();
+        boolean isClone = false;
+        for(int i=0; i<array.size(); i++){
+            for(int k=0; k< array.size(); k++){
+                if(i==9 && k==9){
+                    System.out.println("Повторів немає");
+                    break;
+                }
+                if(i==k) k++;
+                if(array.get(i).equals(array.get(k))){
+                    System.out.println("Студент " + array.get(i) + "повторюється");
+                    isClone = true;
+                    break;
+                }
+                if(isClone == true) break;
+            }
 
+
+        }
+
+
+
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Group group = (Group) o;
+        return Objects.equals(groupName, group.groupName) && Objects.equals(students, group.students);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(groupName, students);
+    }
 }
